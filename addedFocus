@@ -1,0 +1,255 @@
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+import mysql.connector
+from datetime import datetime
+
+
+# Function to increase font size for all widgets
+def increase_font_size(widget, size):
+    font = widget['font']
+    font_family = font.split(' ')[0]
+    widget.configure(font=(font_family, size))
+
+    if isinstance(widget, tk.OptionMenu):
+        menu = widget['menu']
+        try:
+            for index in range(menu.index("end") + 1):
+                menu.entryconfig(index, font=(font_family, size))
+        except TypeError:
+            pass  # Handle the exception
+
+def insert_data():
+    # Get the values from the input fields
+    name = name_entry.get()
+    id_number = id_entry.get()
+    category = category_var.get()
+    product = product_var.get()
+    quantity = quantity_entry.get()
+    shift = shift_var.get()
+    quarter = quarter_var.get()
+    comments = comments_entry.get()
+    date = datetime.now().strftime('%Y-%m-%d')
+    time = datetime.now().strftime('%H:%M:%S')
+
+    # Check if any of the required fields are empty
+    if not all([name, id_number, category, product, quantity, shift, quarter]):
+        messagebox.showerror('Error', 'Please fill in all required fields.')
+        return
+
+    # Confirmation pop-up
+    result = messagebox.askquestion('Confirmation', 'Are you sure you want to submit?', icon='warning')
+    if result == 'no':
+        return
+
+    # Establish a connection to the MySQL server
+    connection = mysql.connector.connect(
+        #host='localhost',
+        host='10.5.34.66',
+        user='remote_user',
+        password='password',
+        database='proj1'
+    )
+    cursor = connection.cursor()
+
+    # SQL statement to insert data
+    sql = "INSERT INTO tech_data (date, time, name, id_number, shift, quarter, category, product, quantity, comments) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    values = (date, time, name, id_number, shift, quarter, category, product, quantity, comments)
+
+    # Execute the SQL statement
+    cursor.execute(sql, values)
+    connection.commit()
+
+    # Show a success message
+    messagebox.showinfo('Success', 'Data inserted successfully!')
+
+    # Reset the input fields
+    name_entry.delete(0, 'end')
+    id_entry.delete(0, 'end')
+    shift_var.set(shift_options[0])
+    quarter_var.set(quarter_options[0])
+    focus_var.set(focus_options[0])
+    category_var.set(category_options[0])
+    product_var.set('Select Product')
+    quantity_entry.delete(0, 'end')
+    comments_entry.delete(0, 'end')
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+
+def update_category_options(*args):
+    selected_focus = focus_var.get()
+
+    # Clear the current category options
+    category_dropdown['menu'].delete(0, 'end')
+    increase_font_size(category_dropdown, font_size)
+
+    # Determine the category options based on the selected focus
+    if selected_focus == 'TECH DATA':
+        category_options = ['Bases', 'PCB', 'Nexeo', 'CU/TSP']
+    elif selected_focus == 'REWORK DATA':
+        category_options = ['Belt Packs', 'Headsets', '3M', 'Chargers', 'Sub Assys']
+    else:
+        category_options = []
+
+    # Set the default option
+    category_var.set(category_options[0])
+
+    # Add the category options to the dropdown menu
+    for option in category_options:
+        category_dropdown['menu'].add_command(label=option, command=tk._setit(category_var, option))
+
+def update_product_options(*args):
+    selected_category = category_var.get()
+
+    # Clear the current product options
+    product_dropdown['menu'].delete(0, 'end')
+    increase_font_size(product_dropdown, font_size)
+
+    # Determine the product options based on the selected category
+    if selected_category == 'Bases':
+        product_options = ['BS6X00', 'BS6000', 'BS7X00', 'Console', 'Router', 'Pro Aud']
+    elif selected_category == 'PCB':
+        product_options = ['PCBHS6', 'PRGPCBAIO', 'PCBHS7', 'PCBCHG', 'PCBBSX', 'PCBIB7']
+    elif selected_category == 'Nexeo':
+        product_options = ['RT7000', 'IB7000', 'SM7000']
+    elif selected_category == 'CU/TSP':
+        product_options = ['CU TEST', 'CU50', 'TSP TEST', 'PCBTSP']
+    elif selected_category == 'Belt Packs':
+        product_options = ['COM6000', 'COM6X00']
+    elif selected_category == 'Headsets':
+        product_options = ['HS6000', 'AIO', 'WIRED', 'HS7000']
+    elif selected_category == '3M':
+        product_options = ['3MG5 POD', '3MG5 BAND', '3MXT-1']
+    elif selected_category == 'Chargers':
+        product_options = ['AC40', 'AC50', 'AC70']
+    elif selected_category == 'Sub Assys':
+        product_options = ['MIC BOOM', '7000MB', 'DND7000', 'SUBAIO', 'DND AIO', 'DND HS6000']
+    else:
+        product_options = []
+
+    # Add the product options to the dropdown menu
+    for option in product_options:
+        product_dropdown['menu'].add_command(label=option, command=tk._setit(product_var, option))
+
+# Create the main window
+window = tk.Tk()
+window.title('Data Entry Form')
+window.geometry('1800x500')
+font_size = 20
+
+# Widgets
+
+# Name
+name_label = tk.Label(window, text='Name:')
+name_label.grid(row=0, column=0, padx=10, pady=10, sticky='e')
+increase_font_size(name_label, font_size)
+
+name_entry = tk.Entry(window)
+name_entry.grid(row=0, column=1, padx=10, pady=10, sticky='w')
+increase_font_size(name_entry, font_size)
+
+# ID Number
+id_label = tk.Label(window, text='ID Number:')
+id_label.grid(row=0, column=2, padx=10, pady=10, sticky='e')
+increase_font_size(id_label, font_size)
+
+id_entry = tk.Entry(window)
+id_entry.grid(row=0, column=3, padx=10, pady=10, sticky='w')
+increase_font_size(id_entry, font_size)
+
+# Focus
+focus_label = tk.Label(window, text='Focus:')
+focus_label.grid(row=1, column=2, padx=10, pady=10, sticky='e')
+increase_font_size(focus_label, font_size)
+
+focus_options = ['TECH DATA', 'REWORK DATA']
+focus_var = tk.StringVar(window)
+focus_var.set(focus_options[0])
+focus_dropdown = tk.OptionMenu(window, focus_var, *focus_options)
+focus_dropdown.configure(fg='dark green')
+focus_dropdown.grid(row=1, column=3, padx=10, pady=10, sticky='w')
+increase_font_size(focus_dropdown, font_size)
+
+focus_var.trace_add('write', update_category_options)
+
+# Category
+category_label = tk.Label(window, text='Category:')
+category_label.grid(row=2, column=2, padx=10, pady=10, sticky='e')
+increase_font_size(category_label, font_size)
+
+category_options = ['Bases', 'PCB', 'Nexeo', 'CU/TSP']  # initial options
+category_var = tk.StringVar(window)
+category_var.set(category_options[0])
+category_dropdown = tk.OptionMenu(window, category_var, *category_options)
+category_dropdown.configure(fg='dark green')
+category_dropdown.grid(row=2, column=3, padx=10, pady=10, sticky='w')
+increase_font_size(category_dropdown, font_size)
+
+category_var.trace_add('write', update_product_options)
+
+# Shift
+shift_label = tk.Label(window, text='Shift:')
+shift_label.grid(row=1, column=0, padx=10, pady=10, sticky='e')
+increase_font_size(shift_label, font_size)
+
+shift_options = ['1st Shift', '2nd Shift']
+shift_var = tk.StringVar(window)
+shift_var.set(shift_options[0])
+shift_dropdown = tk.OptionMenu(window, shift_var, *shift_options)
+shift_dropdown.configure(fg='dark blue')
+shift_dropdown.grid(row=1, column=1, padx=10, pady=10, sticky='w')
+increase_font_size(shift_dropdown, font_size)
+
+# Quarter
+quarter_label = tk.Label(window, text='Quarter:')
+quarter_label.grid(row=2, column=0, padx=10, pady=10, sticky='e')
+increase_font_size(quarter_label, font_size)
+
+quarter_options = ['Q1', 'Q2', 'Q3', 'Q4']
+quarter_var = tk.StringVar(window)
+quarter_var.set(quarter_options[0])
+quarter_dropdown = tk.OptionMenu(window, quarter_var, *quarter_options)
+quarter_dropdown.configure(fg='dark blue')
+quarter_dropdown.grid(row=2, column=1, padx=10, pady=10, sticky='w')
+increase_font_size(quarter_dropdown, font_size)
+
+# Product
+product_label = tk.Label(window, text='Product:')
+product_label.grid(row=3, column=2, padx=10, pady=10, sticky='e')
+increase_font_size(product_label, font_size)
+
+product_var = tk.StringVar(window)
+product_var.set('Select Product')  # default option
+product_dropdown = tk.OptionMenu(window, product_var, '')  # no initial options
+product_dropdown.configure(fg='dark green')
+product_dropdown.grid(row=3, column=3, padx=10, pady=10, sticky='w')
+increase_font_size(product_dropdown, font_size)
+
+# Quantity
+quantity_label = tk.Label(window, text='Quantity:')
+quantity_label.grid(row=4, column=0, padx=10, pady=10, sticky='e')
+increase_font_size(quantity_label, font_size)
+
+quantity_entry = tk.Entry(window)
+quantity_entry.grid(row=4, column=1, padx=10, pady=10, sticky='w')
+increase_font_size(quantity_entry, font_size)
+
+# Comments
+comments_label = tk.Label(window, text='Comments:')
+comments_label.grid(row=4, column=2, padx=10, pady=10, sticky='e')
+increase_font_size(comments_label, font_size)
+
+comments_entry = tk.Entry(window)
+comments_entry.grid(row=4, column=3, padx=10, pady=10, sticky='w')
+increase_font_size(comments_entry, font_size)
+
+# Submit button
+submit_button = tk.Button(window, text='Submit', command=insert_data, bg='light green')
+submit_button.grid(row=5, column=0, columnspan=4, padx=10, pady=10, sticky='ew')
+window.grid_columnconfigure(0, weight=1)
+window.grid_columnconfigure(3, weight=1)
+increase_font_size(submit_button, font_size)
+
+window.mainloop()
