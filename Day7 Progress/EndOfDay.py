@@ -8,10 +8,12 @@ from email.mime.text import MIMEText
 def export_and_clear():
     try:
         # establish connection to your mysql server
-        connection = pymysql.connect(host='10.5.34.66',
-                                    user='remote_user',
-                                    password='password',
-                                    database='proj1')
+        connection = pymysql.connect(
+            host='10.5.34.39',
+            user='Admin',
+            password='TheAdmin',
+            database='productivitytrack'
+        )
 
         # create a cursor object
         cursor = connection.cursor()
@@ -21,7 +23,7 @@ def export_and_clear():
                 'Quantity', 'Productivity', 'Hours_Gained', 'Comments']
 
         # execute the SQL query
-        cursor.execute("SELECT * FROM work_data")
+        cursor.execute("SELECT * FROM workdata")
 
         # fetch all rows from the last executed SQL statement
         data = cursor.fetchall()
@@ -30,7 +32,7 @@ def export_and_clear():
         df_new = pd.DataFrame(data, columns=columns)
 
         # if the excel file already exists, read it, concatenate the new data, and write it back
-        filename = r'C:\Users\mgibson\OneDrive - HM Electronics, Inc\Desktop\work_data.xlsx'
+        filename = r'C:\Users\cldfactoryservice\Desktop\workdata.xlsx'
         if os.path.isfile(filename):
             df_old = pd.read_excel(filename)
             df_old['Date'] = pd.to_datetime(df_old['Date']).dt.date  # format 'Date' as date without time
@@ -40,7 +42,7 @@ def export_and_clear():
         df_new.to_excel(filename, index=False)
 
         # clear the table
-        cursor.execute("DELETE FROM work_data")
+        cursor.execute("DELETE FROM workdata")
 
         # commit the transaction
         connection.commit()
