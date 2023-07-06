@@ -9,11 +9,11 @@ from email.mime.text import MIMEText
 
 art = r"""
 
-    ██       ██      ███          ███        █████ 
-    ██       ██      ████    ████        ██      
-    ██████      ██   ████  ██       █████   
-    ██       ██     ██       ██      ██       ██      
-    ██       ██     ██                    ██      █████ 
+    ██       ██      ███          ███        █████
+    ██       ██      ████    ████        ██     
+    ██████      ██   ████  ██       █████  
+    ██       ██     ██       ██      ██       ██     
+    ██       ██     ██                    ██      █████
                                                                                                                         ⠀⠀⠀⠀⠀
 """
 
@@ -31,10 +31,10 @@ def increase_font_size(widget, size):
 def test_connection():
     try:
         connection = mysql.connector.connect(
-            host='10.5.34.6',
+            host='10.5.34.39',
             user='remote_user',
-            password='password',
-            database='proj1'
+            password='remoteuser',
+            database='productivitytrack'
         )
         connection.close()
         return True
@@ -67,13 +67,9 @@ def insert_data():
     # Establish a connection to the MySQL server
     try:
         connection = mysql.connector.connect(
-            # host='localhost',
-            # host='10.5.34.66',
             host='10.5.34.39',
-#            user='remote_user',
-            user= 'remote_user',
+            user='remote_user',
             password='remoteuser',
-            # database='proj1'
             database='productivitytrack'
         )
     except mysql.connector.Error as err:
@@ -152,7 +148,7 @@ def update_operation_options(*args):
     elif selected_product == 'Belt Packs':
         operation_options = ['COM6000', 'COM6X00']
     elif selected_product == 'Headsets':
-        operation_options = ['HS6000', 'AIO', 'WIRED', 'HS7000']
+       operation_options = ['HS6000', 'AIO', 'WIRED', 'HS7000']
     elif selected_product == '3M':
         operation_options = ['3MG5 POD', '3MG5 BAND', '3MXT-1']
     elif selected_product == 'Chargers':
