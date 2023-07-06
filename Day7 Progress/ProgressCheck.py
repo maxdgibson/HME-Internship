@@ -22,10 +22,10 @@ art = r"""
 def test_connection():
     try:
         connection = mysql.connector.connect(
-            host='10.5.34.66',
+            host='10.5.34.39',
             user='remote_user',
-            password='password',
-            database='proj1'
+            password='remoteuser',
+            database='productivitytrack'
         )
         connection.close()
         return True
@@ -51,16 +51,16 @@ def check_information(event=None):  # Added an optional event parameter to handl
         return  # Stop the function here
 
     cnx = mysql.connector.connect(
-        host='10.5.34.66',
+        host='10.5.34.39',
         user='remote_user',
-        password='password',
-        database='proj1'
+        password='remoteuser',
+        database='productivitytrack'
     )
 
     cursor = cnx.cursor()
     current_date = date.today()
 
-    query = f"SELECT Operation, Hours, Productivity, Comments FROM work_data WHERE `ID Number` = '{user_id}' AND Date = '{current_date}'"
+    query = f"SELECT Operation, Hours, Productivity, Comments FROM workdata WHERE `ID Number` = '{user_id}' AND Date = '{current_date}'"
 
     cursor.execute(query)
     result = cursor.fetchall()
@@ -150,4 +150,3 @@ check_button = tk.Button(root, text="Check", command=check_information, font="Ar
 check_button.pack()
 
 root.mainloop()
-
