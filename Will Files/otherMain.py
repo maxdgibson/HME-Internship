@@ -48,13 +48,13 @@ def insert_data():
     hours = hours_entry.get()
     product = product_var.get()
     operation = operation_var.get()
-    quantity = quantity_entry.get()
+    quantity = quantity_entry.get() or '0'
     # Calculate the productivity
     productivity,hours_gained = calculate_productivity()
     comments = comments_entry.get()
 
     # Check if any of the required fields are empty
-    if not all([name, id_number, hours, product, operation, quantity]):
+    if not all([name, id_number, hours, product, operation]):
         messagebox.showerror('Error', 'Please fill in all required fields.')
         return
 
@@ -187,7 +187,7 @@ def update_operation_options(*args):
     else:
         operation_var.set('Select Operation')  # default option when there are no operations
 def calculate_productivity():
-    quantity_entered = quantity_entry.get()
+    quantity_entered = quantity_entry.get() or '0'
     hours_dedicated = hours_entry.get()
     selected_operation = operation_var.get()  # Assuming you have an entry field for operation name
 
@@ -207,6 +207,9 @@ def calculate_productivity():
 
     # Close the database connection
     conn.close()
+
+    if quantity_entered == '0':
+        return 0, 0
 
     if result is not None:
         uph_value = result[0]
