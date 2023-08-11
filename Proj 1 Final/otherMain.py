@@ -100,7 +100,7 @@ def insert_data():
     # Close the cursor and connection
     cursor.close()
     connection.close()
-    sys.exit()
+    #sys.exit()
 
 # Define a function to fetch data from the database
 def fetch_data_from_proj1(query, database):
@@ -117,7 +117,7 @@ def fetch_data_from_proj1(query, database):
 
         return [row[0] for row in cursor.fetchall()]
     except mysql.connector.Error as error:
-        print(f"One, Failed to fetch data from MySQL: {error}")
+        #print(f"One, Failed to fetch data from MySQL: {error}")
         return []  # return an empty list in case of an error
     finally:
         if connection.is_connected():
@@ -218,7 +218,9 @@ def calculate_productivity():
             return "N/A", "N/A"
         else:
             hg = float(quantity_entered) * float(uph_value)
-            productivity = (hg / float(hours_dedicated)) * 100
+            ActualUPH = float(quantity_entered) / float(hours_dedicated)
+            productivity = ActualUPH / float(uph_value)
+            #productivity = (hg / float(hours_dedicated)) * 100
             productivity = round(productivity, 2)
             return productivity, hg
     else:
