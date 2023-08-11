@@ -134,7 +134,9 @@ def calculate_productivity(quantity_entered, hours_dedicated, selected_operation
             return "N/A", "N/A"
         else:
             hg = float(quantity_entered) * float(uph_value)
-            productivity = (hg / float(hours_dedicated)) * 100
+            ActualUPH = float(quantity_entered) / float(hours_dedicated)
+            productivity = ActualUPH / float(uph_value)
+            # productivity = (hg / float(hours_dedicated)) * 100
             productivity = round(productivity, 2)
             return productivity, hg
     else:
